@@ -29,6 +29,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -70,11 +72,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private LoginButton fbLoginBtn;
     private CallbackManager callbackManager;
+    private AccessTokenTracker accessTokenTracker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+
+            }
+        };
+        accessTokenTracker.startTracking();
+
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -104,7 +115,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mProgressView = findViewById(R.id.login_progress);
 
         //Facebook stuff
+
+
         fbLoginBtn = (LoginButton) findViewById(R.id.login_button);
+        //fbLoginBtn.setReadPermissions();
         fbLoginBtn.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -128,6 +142,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        accessTokenTracker.stopTracking();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
