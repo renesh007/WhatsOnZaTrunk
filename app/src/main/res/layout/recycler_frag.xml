@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!-- Recycler View -->
+    <!-- include progress layout that will be displayed while loading more data -->
+    <!-- initially it is hidden -->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/linear_recyclerview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/loadItemsLayout_recyclerView" />
+
+    <include
+        android:id="@+id/loadItemsLayout_recyclerView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        layout="@layout/loading_bar"
+        android:visibility="gone" />
+
+
+</RelativeLayout>
