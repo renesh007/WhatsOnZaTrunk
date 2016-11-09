@@ -146,6 +146,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     protected void onResume() {
         super.onResume();
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        Toast.makeText(getApplicationContext(),"Facebook Logged in: " + AccessToken.getCurrentAccessToken().toString() ,Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -156,6 +159,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     protected void onStop() {
         super.onStop();
+        accessTokenTracker.stopTracking();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         accessTokenTracker.stopTracking();
     }
 

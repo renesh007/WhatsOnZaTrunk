@@ -13,6 +13,8 @@ import android.widget.AbsListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
+
 import java.util.ArrayList;
 
 /**
@@ -44,6 +46,7 @@ public class LinearLayout_Recycler_View extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.recycler_frag, container,
                 false);
+        FacebookSdk.sdkInitialize(getActivity());
         init();
         populateRecyclerView();
         implementScrollListener();
@@ -100,6 +103,10 @@ public class LinearLayout_Recycler_View extends Fragment {
     private void populateRecyclerView() {
 
         listArrayList = new ArrayList<Event_model>();
+
+        FacebookHelper fbh = new FacebookHelper(getActivity());
+        fbh.getEventId();
+
         for (int i = 0; i < 10; i++) {
             listArrayList.add(new Event_model(i,"Event Example: "+i,"Description","Tuesday: 08-11-2016",
                     "Tuesday: 08-11-2016",1000,"Music",new Stats(),
