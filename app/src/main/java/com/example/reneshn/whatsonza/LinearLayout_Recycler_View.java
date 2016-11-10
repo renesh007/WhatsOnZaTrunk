@@ -13,9 +13,18 @@ import android.widget.AbsListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
+import com.facebook.GraphResponse;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ReneshN on 2016/11/08.
@@ -30,6 +39,7 @@ public class LinearLayout_Recycler_View extends Fragment {
     String[] getTitle, getLocation, getYear;
     private static RelativeLayout bottomLayout;
     private static LinearLayoutManager mLayoutManager;
+    private  ArrayList<ArrayList<String>> ids = new ArrayList<ArrayList<String>>();
 
 
     private static final int[] images = {R.drawable.shore,
@@ -103,18 +113,58 @@ public class LinearLayout_Recycler_View extends Fragment {
     private void populateRecyclerView() {
 
         listArrayList = new ArrayList<Event_model>();
+        bottomLayout.setVisibility(View.VISIBLE);
+        //final ArrayList<ArrayList<String>> ids = new ArrayList<ArrayList<String>>();
+        final FacebookHelper fbh = new FacebookHelper(getActivity());
+        fbh.getEventIdAsync(AccessToken.getCurrentAccessToken(), new GraphRequest.Callback() {
+            @Override
+            public void onCompleted(GraphResponse response) {
+                JSONObject obj = response.getJSONObject();
+                JSONArray arr;
 
-        FacebookHelper fbh = new FacebookHelper(getActivity());
-        fbh.getEventId();
+                try {
+                    arr = obj.getJSONArray("data");
+                    ArrayList<String> temp = new ArrayList<String>();
+                    for (int l=1; l < (arr.length()+1); l++) {
+                        JSONObject oneByOne = arr.getJSONObject(l-1);
+                        if((l%50) > 0){
+                        //for(int i = 0 ; i < 50 ; i ++) {
+                            System.out.println(oneByOne.opt("id").toString());
+                            temp.add(oneByOne.opt("id").toString());
+                        }
+                        else {
+                            ids.add(temp);
+                            temp = new ArrayList<String>();
+                            System.out.println("");
+                            System.out.println("");
+                        }
+                    }
 
-        for (int i = 0; i < 10; i++) {
-            listArrayList.add(new Event_model(i,"Event Example: "+i,"Description","Tuesday: 08-11-2016",
-                    "Tuesday: 08-11-2016",1000,"Music",new Stats(),
-                    new Venue(i,"Durban","venue info",new ArrayList<String>(), "cover Pic" , "profile pic",new EventLocation())));
-        }
-        adapter = new Recycler_Adapter(listArrayList,getActivity());
-        listRecyclerView.setAdapter(adapter);// set adapter on recyclerview
-        adapter.notifyDataSetChanged();// Notify the adapter
+
+
+
+                    fbh.getEventDetailsAsync(AccessToken.getCurrentAccessToken(), ids.get(0), new GraphRequest.Callback() {
+                        @Override
+                        public void onCompleted(GraphResponse response) {
+
+                            for (int i = 0; i < 10; i++) {
+                                listArrayList.add(new Event_model(i,"Event Example: "+ ids.get(i).get(i),"Description","Tuesday: 08-11-2016",
+                                        "Tuesday: 08-11-2016",1000,"Music",new Stats(),
+                                        new Venue(i,"Durban","venue info",new ArrayList<String>(), "cover Pic" , "profile pic",new EventLocation())));
+                            }
+                            adapter = new Recycler_Adapter(listArrayList,getActivity());
+                            listRecyclerView.setAdapter(adapter);// set adapter on recyclerview
+                            adapter.notifyDataSetChanged();// Notify the adapter
+                            bottomLayout.setVisibility(View.GONE);
+                        }
+                    });
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 
     private void init() {
@@ -171,5 +221,23 @@ public class LinearLayout_Recycler_View extends Fragment {
 
             }
         }, 4000);
+    }
+
+    private class GetVenueIds extends GraphRequestAsyncTask{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected List<GraphResponse> doInBackground(Void... params) {
+            return super.doInBackground(params);
+        }
+
+        @Override
+        protected void onPostExecute(List<GraphResponse> result) {
+            super.onPostExecute(result);
+        }
     }
 }

@@ -35,6 +35,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -146,9 +147,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     protected void onResume() {
         super.onResume();
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-        Toast.makeText(getApplicationContext(),"Facebook Logged in: " + AccessToken.getCurrentAccessToken().toString() ,Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(),"Facebook Logged in: " + AccessToken.getCurrentAccessToken().isExpired() ,Toast.LENGTH_SHORT).show();
+        if(AccessToken.getCurrentAccessToken().isExpired() || AccessToken.getCurrentAccessToken() == null){
+            LoginManager.getInstance().logOut();
+            Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
+            startActivity(intent);
+        }else {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
+
     }
 
     @Override
