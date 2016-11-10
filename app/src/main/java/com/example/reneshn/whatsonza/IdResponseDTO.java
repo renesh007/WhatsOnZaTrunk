@@ -1,5 +1,6 @@
 package com.example.reneshn.whatsonza;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,16 +9,15 @@ import java.util.List;
 
 public class IdResponseDTO {
 
-    @com.google.gson.annotations.SerializedName("data")
-    private List<Data> data;
-    @com.google.gson.annotations.SerializedName("paging")
+
+    private ArrayList<Data> data;
     private Paging paging;
 
-    public List<Data> getData() {
+    public ArrayList<Data> getData() {
         return data;
     }
 
-    public void setData(List<Data> data) {
+    public void setData(ArrayList<Data> data) {
         this.data = data;
     }
 
@@ -30,7 +30,6 @@ public class IdResponseDTO {
     }
 
     public static class Data {
-        @com.google.gson.annotations.SerializedName("id")
         private String id;
 
         public String getId() {
@@ -43,9 +42,7 @@ public class IdResponseDTO {
     }
 
     public static class Cursors {
-        @com.google.gson.annotations.SerializedName("before")
         private String before;
-        @com.google.gson.annotations.SerializedName("after")
         private String after;
 
         public String getBefore() {
@@ -66,7 +63,6 @@ public class IdResponseDTO {
     }
 
     public static class Paging {
-        @com.google.gson.annotations.SerializedName("cursors")
         private Cursors cursors;
 
         public Cursors getCursors() {

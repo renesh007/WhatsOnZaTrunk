@@ -9,6 +9,13 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by renesh on 2016-11-09.
  */
@@ -19,17 +26,33 @@ public class FacebookHelper {
         FacebookSdk.sdkInitialize(context);
     }
 
-    public void getEventId(){
+    public IdResponseDTO getEventId(){
+        final IdResponseDTO responseList = new IdResponseDTO();
         GraphRequest request = GraphRequest.newGraphPathRequest(
                 AccessToken.getCurrentAccessToken(),
                 "/search",
                 new GraphRequest.Callback() {
                     @Override
                     public void onCompleted(GraphResponse response) {
-                        Log.d("FACEBOOK",response.getJSONObject().toString());
-                        //Gson gson = new Gson();
-                        //JsonElement jsonElement =  response.getJSONObject();
-                        //IdResponseDTO responseDTO = gson.fromJson(jsonElement,IdResponseDTO.class);
+                        JSONObject jObj = response.getJSONObject();
+                        Log.d("FACEBOOK",jObj.toString());
+                        ArrayList<IdResponseDTO.Data> listData = new ArrayList<IdResponseDTO.Data>();
+                        JSONArray arr = null;
+
+                        try {
+                            arr = jObj.getJSONArray("data");
+
+
+                        for(int i = 0 ; i < arr.length(); i++){
+                            IdResponseDTO.Data tempData = new IdResponseDTO.Data();
+                            tempData.setId(arr.getJSONObject(i).getString("id"));
+                            listData.add(tempData);
+                        }
+                            responseList.setData(listData);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
 
@@ -37,9 +60,10 @@ public class FacebookHelper {
         parameters.putString("center", "-29.858680,31.021840");
         parameters.putString("distance", "1000");
         parameters.putString("fields", "id");
-        parameters.putString("limit", "1000");
+        parameters.putString("limit", "10");
         parameters.putString("type", "place");
         request.setParameters(parameters);
         request.executeAsync();
+        return responseList;
     }
 }
