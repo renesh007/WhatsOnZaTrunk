@@ -19,11 +19,10 @@ import java.util.ArrayList;
 
 public class FacebookHelper {
 
-    private final String eventFields = "id,"+
+    private final String eventFields =
+            "id,"+
             "type," +
             "name," +
-            "about," +
-            "emails," +
             "cover.fields(id,source)," +
             "picture.type(large)," +
             "description," +
@@ -113,30 +112,27 @@ public class FacebookHelper {
                 idList += ids.get(i)+",";
             }
         }
-        parameters.putString("ids", idList);
+        parameters.putString("ids",idList);
         parameters.putString("fields", fields.toString());
         request.setParameters(parameters);
         request.executeAsync();
     }
 
 
-    public ArrayList<ArrayList<String>> groupIds(GraphResponse response){
-
-        ArrayList<ArrayList<String>> ids = new ArrayList<ArrayList<String>>();
-        JSONObject obj = response.getJSONObject();
+    public Event_model groupIds(JSONObject response){
+        Event_model out = new Event_model();
         JSONArray arr;
 
         try {
-            arr = obj.getJSONArray("data");
+            arr = response.getJSONArray("data");
             for (int l=0; l < arr.length(); l++) {
                 JSONObject oneByOne = arr.getJSONObject(l);
-                ArrayList<String> temp = new ArrayList<String>();
-
-                for(int i = 0 ; i < 50 ; i ++) {
-                    System.out.println(oneByOne.opt("id").toString());
-                    temp.add(oneByOne.opt("id").toString());
-                }
-                ids.add(temp);
+                System.out.println(oneByOne.opt("id").toString());
+                out.setName(oneByOne.opt("id").toString());
+                out.setDescription(oneByOne.opt("id").toString());
+                out.setStartTime(oneByOne.opt("id").toString());
+                out.setEndTime(oneByOne.opt("id").toString());
+                out.setCategory(oneByOne.opt("id").toString());
                 System.out.println("");
                 System.out.println("");
             }
@@ -145,6 +141,6 @@ public class FacebookHelper {
             e.printStackTrace();
         }
 
-        return ids;
+        return out;
     }
 }

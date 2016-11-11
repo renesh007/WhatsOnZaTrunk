@@ -140,18 +140,38 @@ public class LinearLayout_Recycler_View extends Fragment {
                         }
                     }
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
 
-
-                    fbh.getEventDetailsAsync(AccessToken.getCurrentAccessToken(), ids.get(0), new GraphRequest.Callback() {
+                    fbh.getEventDetailsAsync(AccessToken.getCurrentAccessToken(), ids.get(1), new GraphRequest.Callback() {
                         @Override
                         public void onCompleted(GraphResponse response) {
+                            JSONObject obj = response.getJSONObject();
+                            JSONObject arr;
+                            ArrayList<String> temp = new ArrayList<String>();
+                            int size =  ids.get(1).size();
+                            for (int i = 0; i <  size; i++) {
+                                String current = ids.get(1).get(i);
+                                try {
+                                    arr = obj.getJSONObject(current);
+                                if(arr.opt("events") != null){
+                                    temp.add(arr.opt("events").toString());
+                                    System.out.println(arr.opt("events").toString());
+                                }
 
-                            for (int i = 0; i < 10; i++) {
-                                listArrayList.add(new Event_model(i,"Event Example: "+ ids.get(i).get(i),"Description","Tuesday: 08-11-2016",
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                               /* listArrayList.add(new Event_model(i,"Event Example: "+ ids.get(i).get(i),"Description","Tuesday: 08-11-2016",
                                         "Tuesday: 08-11-2016",1000,"Music",new Stats(),
                                         new Venue(i,"Durban","venue info",new ArrayList<String>(), "cover Pic" , "profile pic",new EventLocation())));
+                                        */
                             }
+
+
                             adapter = new Recycler_Adapter(listArrayList,getActivity());
                             listRecyclerView.setAdapter(adapter);// set adapter on recyclerview
                             adapter.notifyDataSetChanged();// Notify the adapter
@@ -159,9 +179,7 @@ public class LinearLayout_Recycler_View extends Fragment {
                         }
                     });
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+
 
             }
         });
