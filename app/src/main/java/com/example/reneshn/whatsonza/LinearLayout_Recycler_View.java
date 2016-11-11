@@ -1,14 +1,11 @@
 package com.example.reneshn.whatsonza;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +16,7 @@ import android.widget.Toast;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphResponse;
 
 import org.json.JSONArray;
@@ -26,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ReneshN on 2016/11/08.
@@ -40,6 +39,7 @@ public class LinearLayout_Recycler_View extends Fragment {
     String[] getTitle, getLocation, getYear;
     private static RelativeLayout bottomLayout;
     private static LinearLayoutManager mLayoutManager;
+    private  ArrayList<ArrayList<String>> ids = new ArrayList<ArrayList<String>>();
 
 
     private static final int[] images = {R.drawable.shore,
@@ -113,69 +113,58 @@ public class LinearLayout_Recycler_View extends Fragment {
     private void populateRecyclerView() {
 
         listArrayList = new ArrayList<Event_model>();
-        //loadIdsFromFb.execute();
-        //bottomLayout.setVisibility(View.VISIBLE);
+        bottomLayout.setVisibility(View.VISIBLE);
+        //final ArrayList<ArrayList<String>> ids = new ArrayList<ArrayList<String>>();
+        final FacebookHelper fbh = new FacebookHelper(getActivity());
+        fbh.getEventIdAsync(AccessToken.getCurrentAccessToken(), new GraphRequest.Callback() {
+            @Override
+            public void onCompleted(GraphResponse response) {
+                JSONObject obj = response.getJSONObject();
+                JSONArray arr;
 
-        GraphRequest request = GraphRequest.newGraphPathRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/search",
-                new GraphRequest.Callback() {
-                    @Override
-                    public void onCompleted(GraphResponse response) {
-                        IdResponseDTO responseList =  new IdResponseDTO();
-                        JSONObject jObj = response.getJSONObject();
-                        Log.d("FACEBOOK",jObj.toString());
-                        ArrayList<IdResponseDTO.Data> listData = new ArrayList<IdResponseDTO.Data>();
-                        JSONArray arr = null;
+                try {
+                    arr = obj.getJSONArray("data");
+                    ArrayList<String> temp = new ArrayList<String>();
+                    for (int l=1; l < (arr.length()+1); l++) {
+                        JSONObject oneByOne = arr.getJSONObject(l-1);
+                        if((l%50) > 0){
+                        //for(int i = 0 ; i < 50 ; i ++) {
+                            System.out.println(oneByOne.opt("id").toString());
+                            temp.add(oneByOne.opt("id").toString());
+                        }
+                        else {
+                            ids.add(temp);
+                            temp = new ArrayList<String>();
+                            System.out.println("");
+                            System.out.println("");
+                        }
+                    }
 
-                        try {
-                            arr = jObj.getJSONArray("data");
 
 
-                            for(int i = 0 ; i < arr.length(); i++){
-                                IdResponseDTO.Data tempData = new IdResponseDTO.Data();
-                                tempData.setId(arr.getJSONObject(i).getString("id"));
-                                listData.add(tempData);
+
+                    fbh.getEventDetailsAsync(AccessToken.getCurrentAccessToken(), ids.get(0), new GraphRequest.Callback() {
+                        @Override
+                        public void onCompleted(GraphResponse response) {
+
+                            for (int i = 0; i < 10; i++) {
+                                listArrayList.add(new Event_model(i,"Event Example: "+ ids.get(i).get(i),"Description","Tuesday: 08-11-2016",
+                                        "Tuesday: 08-11-2016",1000,"Music",new Stats(),
+                                        new Venue(i,"Durban","venue info",new ArrayList<String>(), "cover Pic" , "profile pic",new EventLocation())));
                             }
-                            responseList.setData(listData);
-
-//?ids=195907013793787,220872454711809&fields=id,name,about,emails,cover.fields(id,source),picture.type(large),location,events.fields(id,type,name,description,start_time,end_time,category,attending_count,declined_count,maybe_count)
- /*GraphRequest request = GraphRequest.newGraphPathRequest(
-  accessToken,
-  "/",
-  new GraphRequest.Callback() {
-    @Override
-    public void onCompleted(GraphResponse response) {
-      // Insert your code here
-    }
-});
-
-Bundle parameters = new Bundle();
-parameters.putString("ids", "166489496738475,229297950483630,195907013793787,220872454711809");
-parameters.putString("fields", "id,name,about,emails,cover.fields(id,source),picture.type(large),location,events.fields(id,type,name,description,start_time,end_time,category,attending_count,declined_count,maybe_count)");
-request.setParameters(parameters);
-request.executeAsync();*/
-
-
                             adapter = new Recycler_Adapter(listArrayList,getActivity());
                             listRecyclerView.setAdapter(adapter);// set adapter on recyclerview
                             adapter.notifyDataSetChanged();// Notify the adapter
                             bottomLayout.setVisibility(View.GONE);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                });
+                    });
 
-        Bundle parameters = new Bundle();
-        parameters.putString("center", "-29.858680,31.021840");
-        parameters.putString("distance", "5000");
-        parameters.putString("fields", "id");
-        parameters.putString("limit", "50");
-        parameters.putString("type", "place");
-        request.setParameters(parameters);
-        request.executeAsync();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 
     private void init() {
@@ -196,6 +185,7 @@ request.executeAsync();*/
         listRecyclerView.setLayoutManager(mLayoutManager);// for
         // linear data display we use linear layoutmanager
     }
+
     // Method for repopulating recycler view
     private void updateRecyclerView() {
 
@@ -231,5 +221,23 @@ request.executeAsync();*/
 
             }
         }, 4000);
+    }
+
+    private class GetVenueIds extends GraphRequestAsyncTask{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected List<GraphResponse> doInBackground(Void... params) {
+            return super.doInBackground(params);
+        }
+
+        @Override
+        protected void onPostExecute(List<GraphResponse> result) {
+            super.onPostExecute(result);
+        }
     }
 }
