@@ -6,11 +6,11 @@ package com.example.reneshn.whatsonza;
 
 public class Event_model {
     private int id,timeFromNow;
-    private String name,description,startTime,endTime,category;
+    private String name,description,startTime,endTime,category,pictureURL;
     private Stats stats;
     private Venue venue;
 
-    public Event_model(int id, String name, String description, String startTime, String endTime, int timeFromNow, String category, Stats stats, Venue venue) {
+    public Event_model(int id, String name, String description, String startTime, String endTime, int timeFromNow, String category,String pictureURL, Stats stats, Venue venue) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -18,6 +18,7 @@ public class Event_model {
         this.endTime = endTime;
         this.timeFromNow = timeFromNow;
         this.category = category;
+        this.pictureURL = pictureURL;
         this.stats = stats;
         this.venue = venue;
     }
@@ -30,8 +31,17 @@ public class Event_model {
         this.endTime = "";
         this.timeFromNow = 0;
         this.category = "";
+        this.pictureURL = "";
         this.stats = new Stats();
         this.venue = new Venue();
+    }
+
+    public String getPictureURL() {
+        return pictureURL;
+    }
+
+    public void setPictureURL(String pictureURL) {
+        this.pictureURL = pictureURL;
     }
 
     public int getId() {

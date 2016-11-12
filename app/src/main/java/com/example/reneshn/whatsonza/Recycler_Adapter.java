@@ -1,13 +1,13 @@
 package com.example.reneshn.whatsonza;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -17,32 +17,32 @@ import java.util.ArrayList;
 
 public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView_Holder> {
 
-    private ArrayList<Event_model> arrayList;
+    private ArrayList<Host> arrayList;
     private Context context;
 
-    public Recycler_Adapter(ArrayList<Event_model> arrayList, Context context) {
+    public Recycler_Adapter(ArrayList<Host> arrayList, Context context) {
         this.arrayList = arrayList;
         this.context = context;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView_Holder holder, int position) {
-        final Event_model model = arrayList.get(position);
+        final Host model = arrayList.get(position);
 
         RecyclerView_Holder mainHolder = (RecyclerView_Holder) holder;// holder
 
-        /*TODO*/
-        Bitmap image = BitmapFactory.decodeResource(context.getResources(),R.drawable.shivaji);
-
-        // This will convert drawbale image into
-        // bitmap
-
         // setting data over views
-        mainHolder.list_title.setText(model.getName());
-        mainHolder.list_location.setText(model.getVenue().getName());
-        mainHolder.list_date.setText(model.getStartTime());
-        mainHolder.list_imageView.setImageBitmap(image);
-
+        mainHolder.list_title.setText(model.getEventList().getName());
+        System.out.println("NAME: " + model.getEventList().getName());
+        mainHolder.list_location.setText(model.getEventList().getVenue().getName());
+        System.out.println("LOCATION NAME: " + model.getEventList().getVenue().getName());
+        mainHolder.list_date.setText(model.getEventList().getStartTime());
+        System.out.println("DATE: "+model.getEventList().getStartTime() );
+        Picasso.with(context)
+                .load(model.getEventList().getPictureURL())
+                .fit()
+                .into(mainHolder.list_imageView);
+        System.out.println("\n_________________________________"+ position +"____________________________________\n");
         // Implement click listener over layout
         mainHolder.setClickListener(new RecyclerView_OnClickListener.OnClickListener() {
 

@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
-import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphResponse;
 
 import org.json.JSONArray;
@@ -24,7 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ReneshN on 2016/11/08.
@@ -34,7 +32,7 @@ public class LinearLayout_Recycler_View extends Fragment {
 
     private static View view;
     private static RecyclerView listRecyclerView;
-    private static ArrayList<Event_model> listArrayList;
+    private static ArrayList<Host> listArrayList;
     private static Recycler_Adapter adapter;
     String[] getTitle, getLocation, getYear;
     private static RelativeLayout bottomLayout;
@@ -112,7 +110,7 @@ public class LinearLayout_Recycler_View extends Fragment {
 
     private void populateRecyclerView() {
 
-        listArrayList = new ArrayList<Event_model>();
+        listArrayList = new ArrayList<Host>();
         bottomLayout.setVisibility(View.VISIBLE);
         //final ArrayList<ArrayList<String>> ids = new ArrayList<ArrayList<String>>();
         final FacebookHelper fbh = new FacebookHelper(getActivity());
@@ -157,7 +155,12 @@ public class LinearLayout_Recycler_View extends Fragment {
                                 try {
                                     arr = obj.getJSONObject(current);
                                 if(arr.opt("events") != null){
-                                    temp.add(arr.opt("events").toString());
+                                    JSONArray data = arr.getJSONObject("events").getJSONArray("data");
+                                    for(int j = 0 ; j < data.length() ; j++){
+                                        JSONObject dataTemp = data.getJSONObject(j);
+                                        listArrayList.add(fbh.parseEvent(arr,dataTemp));
+                                    }
+                                    //temp.add(arr.opt("events").toString());
                                     System.out.println(arr.opt("events").toString());
                                 }
 
@@ -165,7 +168,7 @@ public class LinearLayout_Recycler_View extends Fragment {
                                     e.printStackTrace();
                                 }
 
-                               /* listArrayList.add(new Event_model(i,"Event Example: "+ ids.get(i).get(i),"Description","Tuesday: 08-11-2016",
+                               /* listArrayList.add(new Event_model(i,"Host Example: "+ ids.get(i).get(i),"Description","Tuesday: 08-11-2016",
                                         "Tuesday: 08-11-2016",1000,"Music",new Stats(),
                                         new Venue(i,"Durban","venue info",new ArrayList<String>(), "cover Pic" , "profile pic",new EventLocation())));
                                         */
@@ -224,9 +227,11 @@ public class LinearLayout_Recycler_View extends Fragment {
                     // value
 
                     // add random data to arraylist
-                    listArrayList.add(new Event_model(i,"Event Example:: "+ i,"Description","Tuesday: 08-11-2016",
+                    /*
+                    listArrayList.add(new Event_model(i,"Host Example:: "+ i,"Description","Tuesday: 08-11-2016",
                             "Tuesday: 08-11-2016",1000,"Music",new Stats(),
                             new Venue(i,"Durban","venue info",new ArrayList<String>(), "cover Pic" , "profile pic",new EventLocation())));
+                */
                 }
                 adapter.notifyDataSetChanged();// notify adapter
 
@@ -241,21 +246,4 @@ public class LinearLayout_Recycler_View extends Fragment {
         }, 4000);
     }
 
-    private class GetVenueIds extends GraphRequestAsyncTask{
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected List<GraphResponse> doInBackground(Void... params) {
-            return super.doInBackground(params);
-        }
-
-        @Override
-        protected void onPostExecute(List<GraphResponse> result) {
-            super.onPostExecute(result);
-        }
-    }
 }

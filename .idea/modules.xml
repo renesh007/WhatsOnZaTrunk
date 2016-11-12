@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/WhatsOnZaTrunk.iml" filepath="$PROJECT_DIR$/WhatsOnZaTrunk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WhatsOnZa.iml" filepath="$PROJECT_DIR$/WhatsOnZa.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

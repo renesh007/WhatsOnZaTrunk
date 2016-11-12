@@ -4,11 +4,12 @@ package com.example.reneshn.whatsonza;
  * Created by ReneshN on 2016/11/08.
  */
 public class EventLocation {
-    private String city,country,street,zip;
+    private String city,country,street;
     private double latitude,longitude;
+    int zip;
 
 
-    public EventLocation(String city, String country, String street, String zip, double latitude, double longitude) {
+    public EventLocation(String city, String country, String street, int zip, double latitude, double longitude) {
         this.city = city;
         this.country = country;
         this.street = street;
@@ -21,7 +22,7 @@ public class EventLocation {
         this.city = "";
         this.country = "";
         this.street = "";
-        this.zip = "";
+        this.zip = 0;
         this.latitude = 0.0;
         this.longitude = 0.0;
     }
@@ -50,11 +51,11 @@ public class EventLocation {
         this.street = street;
     }
 
-    public String getZip() {
+    public int getZip() {
         return zip;
     }
 
-    public void setZip(String zip) {
+    public void setZip(int zip) {
         this.zip = zip;
     }
 
