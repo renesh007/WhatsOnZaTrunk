@@ -38,7 +38,8 @@ public class LinearLayout_Recycler_View extends Fragment {
     private static RelativeLayout bottomLayout;
     private static LinearLayoutManager mLayoutManager;
     private  ArrayList<ArrayList<String>> ids = new ArrayList<ArrayList<String>>();
-
+    private int parentPos = 0;
+    private int childPos = 0;
 
     private static final int[] images = {R.drawable.shore,
             R.drawable.shivaji, R.drawable.victoria,};
@@ -143,15 +144,15 @@ public class LinearLayout_Recycler_View extends Fragment {
                 }
 
 
-                    fbh.getEventDetailsAsync(AccessToken.getCurrentAccessToken(), ids.get(1), new GraphRequest.Callback() {
+                    fbh.getEventDetailsAsync(AccessToken.getCurrentAccessToken(), ids.get(parentPos), new GraphRequest.Callback() {
                         @Override
                         public void onCompleted(GraphResponse response) {
                             JSONObject obj = response.getJSONObject();
                             JSONObject arr;
                             ArrayList<String> temp = new ArrayList<String>();
-                            int size =  ids.get(1).size();
+                            int size =  ids.get(parentPos).size();
                             for (int i = 0; i <  size; i++) {
-                                String current = ids.get(1).get(i);
+                                String current = ids.get(parentPos).get(i);
                                 try {
                                     arr = obj.getJSONObject(current);
                                 if(arr.opt("events") != null){
@@ -159,6 +160,12 @@ public class LinearLayout_Recycler_View extends Fragment {
                                     for(int j = 0 ; j < data.length() ; j++){
                                         JSONObject dataTemp = data.getJSONObject(j);
                                         listArrayList.add(fbh.parseEvent(arr,dataTemp));
+
+                                        if(listArrayList.size() <=10){
+                                            parentPos = i;
+                                            childPos = j;
+                                            break;
+                                        }
                                     }
                                     //temp.add(arr.opt("events").toString());
                                     System.out.println(arr.opt("events").toString());
@@ -221,27 +228,48 @@ public class LinearLayout_Recycler_View extends Fragment {
             @Override
             public void run() {
 
-                // Loop for 3 items
-                for (int i = 0; i < 9; i++) {
-                    //int value = new RandomNumberGenerator().RandomGenerator();// Random
-                    // value
+                final FacebookHelper fbh = new FacebookHelper(getActivity());
+                fbh.getEventDetailsAsync(AccessToken.getCurrentAccessToken(), ids.get(parentPos), new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse response) {
+                        JSONObject obj = response.getJSONObject();
+                        JSONObject arr;
+                        ArrayList<String> temp = new ArrayList<String>();
+                        int size = ids.get(parentPos).size();
+                        for (int i = parentPos; i < size; i++) {
+                            String current = ids.get(parentPos).get(i);
+                            try {
+                                arr = obj.getJSONObject(current);
+                                if (arr.opt("events") != null) {
+                                    JSONArray data = arr.getJSONObject("events").getJSONArray("data");
+                                    for (int j = childPos; j < data.length(); j++) {
+                                        JSONObject dataTemp = data.getJSONObject(j);
+                                        listArrayList.add(fbh.parseEvent(arr, dataTemp));
 
-                    // add random data to arraylist
-                    /*
-                    listArrayList.add(new Event_model(i,"Host Example:: "+ i,"Description","Tuesday: 08-11-2016",
-                            "Tuesday: 08-11-2016",1000,"Music",new Stats(),
-                            new Venue(i,"Durban","venue info",new ArrayList<String>(), "cover Pic" , "profile pic",new EventLocation())));
-                */
-                }
-                adapter.notifyDataSetChanged();// notify adapter
+                                        if (listArrayList.size() <= 10) {
+                                            parentPos = i;
+                                            childPos = j;
+                                            break;
+                                        }
+                                    }
+                                    //temp.add(arr.opt("events").toString());
+                                    System.out.println(arr.opt("events").toString());
+                                }
 
-                // Toast for task completion
-                Toast.makeText(getActivity(), "Items Updated.",
-                        Toast.LENGTH_SHORT).show();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
-                // After adding new data hide the view.
-                bottomLayout.setVisibility(View.GONE);
+                        adapter.notifyDataSetChanged();// Notify the adapter
 
+                        // Toast for task completion
+                        Toast.makeText(getActivity(), "Items Updated.",
+                                Toast.LENGTH_SHORT).show();
+                        // After adding new data hide the view.
+                        bottomLayout.setVisibility(View.GONE);
+                    }
+                });
             }
         }, 4000);
     }
